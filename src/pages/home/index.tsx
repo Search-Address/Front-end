@@ -5,7 +5,7 @@ import searchIcon from '../../assets/searchIcon.svg';
 import api from '../../services/api';
 import { cpfMask } from '../../utils/masks';
 
-export interface Result {
+export interface Address {
   status?: number;
   code?: string;
   state?: string;
@@ -18,16 +18,16 @@ export interface Result {
 export function Home() {
   const [cep, setCep] = useState('');
   const [error, setError] = useState('');
-  const [result, setResult] = useState<Result>();
+  const [address, setAddress] = useState<Address>();
   const [isFetching, setIsFetching] = useState(false);
 
   const handleSearchAddress = useCallback(async () => {
     setIsFetching(true);
     setError('');
-    setResult({});
+    setAddress({});
     await api
       .get(`http://localhost:3333/cep/search-address?cep=${cep}`)
-      .then(response => setResult(response.data))
+      .then(response => setAddress(response.data))
       .catch(err => setError(err.response.data.message))
       .finally(() => setIsFetching(false));
   }, [cep]);
@@ -57,19 +57,17 @@ export function Home() {
         <WrraperAddress>
           {isFetching && <p>Carregando...</p>}
 
-          {!isFetching && result && result.status === 200 ? (
+          {!isFetching && address && address.status === 200 ? (
             <>
-              <p>Endereço: {result.address}</p>
-              <p>Estado: {result.state}</p>
-              <p>Cidade: {result.city}</p>
-              <p>Município: {result.district}</p>
-              <p>Cep: {result.code}</p>
+              <p>Endereço: {address.address}</p>
+              <p>Estado: {address.state}</p>
+              <p>Cidade: {address.city}</p>
+              <p>Município: {address.district}</p>
+              <p>Cep: {address.code}</p>
             </>
           ) : (
-            <p>{result?.message || error}</p>
+            <p>{address?.message || error}</p>
           )}
-
-          {/* <p>{error}</p> */}
         </WrraperAddress>
       </Content>
     </Wrraper>
